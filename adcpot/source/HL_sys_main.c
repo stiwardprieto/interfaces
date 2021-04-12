@@ -77,8 +77,9 @@ int main(void)
 
     sciInit();
     adcInit();
+
+    adcStartConversion(adcREG1,adcGROUP1);
     while(1){
-        adcStartConversion(adcREG1,adcGROUP1);
         while(!adcIsConversionComplete(adcREG1,adcGROUP1));
         adcGetData(adcREG1,1U,adc_data_ptr);
         value = (unsigned int)adc_data_ptr -> value;
