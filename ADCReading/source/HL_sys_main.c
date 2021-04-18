@@ -53,7 +53,7 @@
 #include "HL_sys_common.h"
 
 /* USER CODE BEGIN (1) */
-unsigned char command[8];
+char texto[50];
 /* USER CODE END */
 
 /** @fn void main(void)
@@ -65,6 +65,21 @@ unsigned char command[8];
 */
 
 /* USER CODE BEGIN (2) */
+void delay_ms(uint32 reta)
+{
+    uint32  cont_, cont1_;
+    for (cont_=0;cont_<reta;cont_++){
+        for (cont1_=0;cont1_<27258;cont1_++);// delay 1ms
+    }
+}
+
+void sci_send_text_const(const char *info){
+    while(*info)     sciSendByte(sciREG1, *info++);
+}
+void sci_send_text(char *info)
+{
+    while(*info)     sciSendByte(sciREG1, *info++);
+}
 /* USER CODE END */
 
 int main(void)
@@ -77,17 +92,17 @@ int main(void)
 
     sciInit();
     adcInit();
-
+    sci_send_text_const("Iniciando lectura \r\n");
     adcStartConversion(adcREG1,adcGROUP1);
     while(1){
         while(!adcIsConversionComplete(adcREG1,adcGROUP1));
         adcGetData(adcREG1,1U,adc_data_ptr);
         value = (unsigned int)adc_data_ptr -> value;
         presion = value/0.0297 + 95/9;
-        NumberOfChars = ltoa(presion, (char *)command, 10);
-        sciSend(sciREG1, 8, (unsigned char *)"PRESION = ");
-        sciSend(sciREG1, (unsigned int)&NumberOfChars, command);
-        sciSend(sciREG1, 2, (unsigned char *)"\r\n");
+        sprintf(texto,"Presion: %u \r\n",presion);
+        sci_send_text(texto);
+        adcStopConversion(adcREG1,adcGROUP1);
+        delay_ms(1000);
     }
 /* USER CODE END */
 
